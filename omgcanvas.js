@@ -63,6 +63,10 @@ function CanvasContext(skcanvas) {
     save: function() {
       paint = new plask.SkPaint(paint);  // Dup top.
       state = {paint: paint,
+               lineWidth: state.lineWidth,
+               lineCap: state.lineCap,
+               lineJoin: state.lineJoin,
+               miterLimit: state.miterLimit,
                strokeColor: state.strokeColor,  // Read only, no dup().
                strokeStyle: state.strokeStyle,
                fillColor: state.fillColor,      // Read only, no dup().
