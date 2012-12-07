@@ -40,8 +40,10 @@ function CanvasContext(skcanvas) {
 
   var paint = new plask.SkPaint();  // Track top paint element of state_stack.
   paint.setAntiAlias(true);
+  paint.setStrokeWidth(1);  // Skia dDefaults to 0?
 
   var state_stack = [{paint: paint,
+                      lineWidth: 1,
                       strokeColor: [0, 0, 0, 1],
                       strokeStyle: '#000000',
                       fillColor: [0, 0, 0, 1],
