@@ -168,6 +168,14 @@ function CanvasContext(skcanvas) {
       path.lineTo(x, y);
     },
 
+    // void rect(in [Optional=DefaultIsUndefined] float x,
+    //           in [Optional=DefaultIsUndefined] float y,
+    //           in [Optional=DefaultIsUndefined] float width,
+    //           in [Optional=DefaultIsUndefined] float height);
+    rect: function(x, y, w, h) {
+      path.addRect(x, y, x+w, y+h);
+    },
+
     // void arcTo(in [Optional=DefaultIsUndefined] float x1,
     //            in [Optional=DefaultIsUndefined] float y1,
     //            in [Optional=DefaultIsUndefined] float x2,
@@ -334,10 +342,6 @@ exports.CanvasContext = CanvasContext;
 // #endif
 // 
 // 
-// void rect(in [Optional=DefaultIsUndefined] float x,
-//           in [Optional=DefaultIsUndefined] float y,
-//           in [Optional=DefaultIsUndefined] float width,
-//           in [Optional=DefaultIsUndefined] float height);
 // boolean isPointInPath(in [Optional=DefaultIsUndefined] float x,
 //                       in [Optional=DefaultIsUndefined] float y);
 // 
