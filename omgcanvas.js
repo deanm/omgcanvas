@@ -353,6 +353,70 @@ function CanvasContext(skcanvas) {
                            0,   0,  1);
     },
 
+    // NOTE(deanm): The pixel access is not going to be a particularly great
+    // implementation.  But actually even what the browsers do isn't very good,
+    // which is why Plask's canvas works different (and BGRA ordering).
+
+    // ImageData createImageData(in ImageData? imagedata)
+    //     raises (DOMException);
+    // ImageData createImageData(in float sw, in float sh)
+    //     raises (DOMException);
+    createImageData: function(sw, sh) {
+      if (arguments.length === 1) {
+        sh = sw.height; sw = sw.width;
+      }
+
+      // TODO(deanm): Switch to Uint8ClampedArray.
+      var data = new Uint8Array(sw * sh * 4);
+
+      // TODO(deanm): Hopefully there doesn't need to be an ImageData type.
+      return {width: sw, height: sh, data: data};
+    },
+
+    // ImageData getImageData(in [Optional=DefaultIsUndefined] float sx,
+    //                        in [Optional=DefaultIsUndefined] float sy,
+    //                        in [Optional=DefaultIsUndefined] float sw,
+    //                        in [Optional=DefaultIsUndefined] float sh)
+    //     raises(DOMException);
+    getImageData: function(sx, sy, sw, sh) {
+      var w = skcanvas.width, h = skcanvas.height;
+      var id = this.createImageData(sw, sh);
+      var data = id.data;
+      for (var dy = 0; dy < sh; ++dy) {  // Copy and swizzle.
+        var dsl = (dy * sw) << 2;
+        var csl = ((sy + dy) * w + sx) << 2;
+        for (var dx = 0; dx < sw; ++dx) {
+          var b = skcanvas[csl++], g = skcanvas[csl++], r = skcanvas[csl++]
+              a = skcanvas[csl++];
+          data[dsl++] = r; data[dsl++] = g; data[dsl++] = b; data[dsl++] = a;
+        }
+      }
+
+      return id;
+    },
+
+    // void putImageData(in ImageData? imagedata, in float dx, in float dy)
+    //     raises(DOMException);
+    // void putImageData(in ImageData? imagedata, in float dx, in float dy,
+    //                   in float dirtyX, in float dirtyY,
+    //                   in float dirtyWidth, in float dirtyHeight)
+    //     raises(DOMException);
+    putImageData: function(imagedata, sx, sy) {
+      // TODO(deanm): Support dirty, although it is only an optimization.
+      var w = skcanvas.width, h = skcanvas.height;
+      var sw = imagedata.width, sh = imagedata.height;
+      var data = imagedata.data;
+      for (var dy = 0; dy < sh; ++dy) {  // Copy and swizzle.
+        var dsl = (dy * sw) << 2;
+        var csl = ((sy + dy) * w + sx) << 2;
+        for (var dx = 0; dx < sw; ++dx) {
+          var r = data[dsl++], g = data[dsl++]; b = data[dsl++],
+              a = data[dsl++];
+          skcanvas[csl++] = b; skcanvas[csl++] = g; skcanvas[csl++] = r;
+          skcanvas[csl++] = a;
+        }
+      }
+    },
   };
 }
 
@@ -462,11 +526,6 @@ exports.CanvasContext = CanvasContext;
 // void setShadow(in float width, in float height, in float blur, in float r, in float g, in float b, in float a);
 // void setShadow(in float width, in float height, in float blur, in float c, in float m, in float y, in float k, in float a);
 // 
-// void putImageData(in ImageData? imagedata, in float dx, in float dy)
-//     raises(DOMException);
-// void putImageData(in ImageData? imagedata, in float dx, in float dy, in float dirtyX, in float dirtyY, in float dirtyWidth, in float dirtyHeight)
-//     raises(DOMException);
-// 
 // void webkitPutImageDataHD(in ImageData? imagedata, in float dx, in float dy)
 //     raises(DOMException);
 // void webkitPutImageDataHD(in ImageData? imagedata, in float dx, in float dy, in float dirtyX, in float dirtyY, in float dirtyWidth, in float dirtyHeight)
@@ -476,13 +535,3 @@ exports.CanvasContext = CanvasContext;
 //     raises (DOMException);
 // CanvasPattern createPattern(in HTMLImageElement? image, in [TreatNullAs=NullString] DOMString repetitionType)
 //     raises (DOMException);
-// ImageData createImageData(in ImageData? imagedata)
-//     raises (DOMException);
-// ImageData createImageData(in float sw, in float sh)
-//     raises (DOMException);
-// 
-// 
-// // pixel manipulation
-// ImageData getImageData(in [Optional=DefaultIsUndefined] float sx, in [Optional=DefaultIsUndefined] float sy,
-//                        in [Optional=DefaultIsUndefined] float sw, in [Optional=DefaultIsUndefined] float sh)
-//     raises(DOMException);
