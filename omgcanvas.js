@@ -203,6 +203,24 @@ function CanvasContext(skcanvas) {
       }
     },
 
+    // void quadraticCurveTo(in [Optional=DefaultIsUndefined] float cpx,
+    //                       in [Optional=DefaultIsUndefined] float cpy,
+    //                       in [Optional=DefaultIsUndefined] float x,
+    //                       in [Optional=DefaultIsUndefined] float y);
+    quadraticCurveTo: function(cpx, cpy, x, y) {
+      path.quadTo(cpx, cpy, x, y);
+    },
+
+    // void bezierCurveTo(in [Optional=DefaultIsUndefined] float cp1x,
+    //                    in [Optional=DefaultIsUndefined] float cp1y,
+    //                    in [Optional=DefaultIsUndefined] float cp2x,
+    //                    in [Optional=DefaultIsUndefined] float cp2y,
+    //                    in [Optional=DefaultIsUndefined] float x,
+    //                    in [Optional=DefaultIsUndefined] float y);
+    bezierCurveTo: function(cpx1, cp1y, cp2x, cp2y, x, y) {
+      path.cubicTo(cpx1, cp1y, cp2x, cp2y, x, y);
+    },
+
     // void fill();
     fill: function() {
       // TODO(deanm): Avoid the save/restore.
@@ -291,16 +309,6 @@ exports.CanvasContext = CanvasContext;
 // #endif
 // 
 // 
-// void quadraticCurveTo(in [Optional=DefaultIsUndefined] float cpx,
-//                       in [Optional=DefaultIsUndefined] float cpy,
-//                       in [Optional=DefaultIsUndefined] float x,
-//                       in [Optional=DefaultIsUndefined] float y);
-// void bezierCurveTo(in [Optional=DefaultIsUndefined] float cp1x,
-//                    in [Optional=DefaultIsUndefined] float cp1y,
-//                    in [Optional=DefaultIsUndefined] float cp2x,
-//                    in [Optional=DefaultIsUndefined] float cp2y,
-//                    in [Optional=DefaultIsUndefined] float x,
-//                    in [Optional=DefaultIsUndefined] float y);
 // void rect(in [Optional=DefaultIsUndefined] float x,
 //           in [Optional=DefaultIsUndefined] float y,
 //           in [Optional=DefaultIsUndefined] float width,
