@@ -40,10 +40,14 @@ function CanvasContext(skcanvas) {
 
   var paint = new plask.SkPaint();  // Track top paint element of state_stack.
   paint.setAntiAlias(true);
-  paint.setStrokeWidth(1);  // Skia dDefaults to 0?
+  paint.setStrokeWidth(1);  // Skia defaults to 0?
+  paint.setStrokeMiter(10);  // Skia defaults to 4.
 
   var state_stack = [{paint: paint,
                       lineWidth: 1,
+                      lineCap: 'butt',
+                      lineJoin: 'miter',
+                      miterLimit: 10,
                       strokeColor: [0, 0, 0, 1],
                       strokeStyle: '#000000',
                       fillColor: [0, 0, 0, 1],
@@ -105,6 +109,53 @@ function CanvasContext(skcanvas) {
       // TODO(deanm): Have to parseFloat for strings?
       state.lineWidth = v;
       paint.setStrokeWidth(v);
+    },
+
+    // [TreatNullAs=NullString] attribute DOMString lineCap;
+    // NOTE(deanm): Spec defaults to "butt".
+    get lineCap() { return state.lineCap; },
+    set lineCap(v) {
+      var cap = null;
+
+      // TODO(deanm): Case insensitive or any trimming?
+      switch (v) {
+        case 'butt': cap = paint.kButtCap; break;
+        case 'round': cap = paint.kRoundCap; break;
+        case 'square': cap = paint.kSquareCap; break;
+        default: return;
+      }
+
+      state.lineCap = v;
+      paint.setStrokeCap(cap);
+    },
+
+    // [TreatNullAs=NullString] attribute DOMString lineJoin;
+    // NOTE(deanm): Spec defaults to "miter".
+    get lineJoin() { return state.lineJoin; },
+    set lineJoin(v) {
+      var join = null;
+
+      // TODO(deanm): Case insensitive or any trimming?
+      switch (v) {
+        case 'round': join = paint.kRoundJoin; break;
+        case 'bevel': join = paint.kBevelJoin; break;
+        case 'miter': join = paint.kMiterJoin; break;
+        default: return;
+      }
+
+      state.lineJoin = v;
+      paint.setStrokeJoin(join);
+    },
+
+    // attribute float miterLimit;
+    get miterLimit() { return state.miterLimit; },
+    set miterLimit(v) {
+      // NOTE(deanm): From the spec:
+      //   On setting, zero, negative, infinite, and NaN values must be ignored
+      if (v > 0 && isFinite(v)) {
+        state.miterLimit = v;
+        paint.setStrokeMiter(v);
+      }
     },
 
     // void clearRect(in [Optional=DefaultIsUndefined] float x,
@@ -322,9 +373,6 @@ exports.CanvasContext = CanvasContext;
 //                                     in [Optional=DefaultIsUndefined] float r1)
 //     raises (DOMException);
 // 
-// [TreatNullAs=NullString] attribute DOMString lineCap;
-// [TreatNullAs=NullString] attribute DOMString lineJoin;
-// attribute float miterLimit;
 // 
 // attribute float shadowOffsetX;
 // attribute float shadowOffsetY;
