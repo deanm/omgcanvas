@@ -64,6 +64,7 @@ function CanvasContext(skcanvas) {
                fillColor: state.fillColor,      // Read only, no dup().
                fillStyle: state.fillStyle};
       state_stack.push(state);
+      skcanvas.save();  // Matrix and clip.
     },
 
     // void restore();
@@ -72,6 +73,7 @@ function CanvasContext(skcanvas) {
         state_stack.pop();
         state = state_stack[state_stack.length - 1];
         paint = state.paint;
+        skcanvas.restore();  // Matrix and clip.
       }
     },
 
@@ -248,6 +250,46 @@ function CanvasContext(skcanvas) {
       skcanvas.clipPath(path);
     },
 
+    // void scale(in [Optional=DefaultIsUndefined] float sx,
+    //            in [Optional=DefaultIsUndefined] float sy);
+    scale: function(sx, sy) {
+      skcanvas.scale(sx, sy);
+    },
+
+    // void rotate(in [Optional=DefaultIsUndefined] float angle);
+    rotate: function(angle) {
+      skcanvas.rotate(angle * 180 / plask.kPI);
+    },
+
+    // void translate(in [Optional=DefaultIsUndefined] float tx,
+    //                in [Optional=DefaultIsUndefined] float ty);
+    translate: function(tx, ty) {
+      skcanvas.translate(tx, ty);
+    },
+
+    // void transform(in [Optional=DefaultIsUndefined] float m11,
+    //                in [Optional=DefaultIsUndefined] float m12,
+    //                in [Optional=DefaultIsUndefined] float m21,
+    //                in [Optional=DefaultIsUndefined] float m22,
+    //                in [Optional=DefaultIsUndefined] float dx,
+    //                in [Optional=DefaultIsUndefined] float dy);
+    transform: function(m11, m12, m21, m22, dx, dy) {
+      skcanvas.concatMatrix(m11, m21, dx,
+                            m12, m22, dy,
+                              0,   0,  1);
+    },
+    // void setTransform(in [Optional=DefaultIsUndefined] float m11,
+    //                   in [Optional=DefaultIsUndefined] float m12,
+    //                   in [Optional=DefaultIsUndefined] float m21,
+    //                   in [Optional=DefaultIsUndefined] float m22,
+    //                   in [Optional=DefaultIsUndefined] float dx,
+    //                   in [Optional=DefaultIsUndefined] float dy);
+    setTransform: function(m11, m12, m21, m22, dx, dy) {
+      skcanvas.setMatrix(m11, m21, dx,
+                         m12, m22, dy,
+                           0,   0,  1);
+    },
+
   };
 }
 
@@ -255,23 +297,6 @@ exports.CanvasContext = CanvasContext;
 
 // TODO(deanm): These are the parts of the interface unfinished.
 
-// void scale(in [Optional=DefaultIsUndefined] float sx,
-//            in [Optional=DefaultIsUndefined] float sy);
-// void rotate(in [Optional=DefaultIsUndefined] float angle);
-// void translate(in [Optional=DefaultIsUndefined] float tx,
-//                in [Optional=DefaultIsUndefined] float ty);
-// void transform(in [Optional=DefaultIsUndefined] float m11,
-//                in [Optional=DefaultIsUndefined] float m12,
-//                in [Optional=DefaultIsUndefined] float m21,
-//                in [Optional=DefaultIsUndefined] float m22,
-//                in [Optional=DefaultIsUndefined] float dx,
-//                in [Optional=DefaultIsUndefined] float dy);
-// void setTransform(in [Optional=DefaultIsUndefined] float m11,
-//                   in [Optional=DefaultIsUndefined] float m12,
-//                   in [Optional=DefaultIsUndefined] float m21,
-//                   in [Optional=DefaultIsUndefined] float m22,
-//                   in [Optional=DefaultIsUndefined] float dx,
-//                   in [Optional=DefaultIsUndefined] float dy);
 // 
 // attribute float globalAlpha;
 // [TreatNullAs=NullString] attribute DOMString globalCompositeOperation;
