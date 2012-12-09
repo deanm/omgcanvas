@@ -247,6 +247,15 @@ function CanvasContext(skcanvas) {
       }
     },
 
+    // void setLineWidth(in [Optional=DefaultIsUndefined] float width);
+    setLineWidth: function(v) { this.lineWidth = v; },
+    // void setLineCap(in [Optional=DefaultIsUndefined] DOMString cap);
+    setLineCap: function(v) { this.lineCap = v; },
+    // void setLineJoin(in [Optional=DefaultIsUndefined] DOMString join);
+    setLineJoin: function(v) { this.lineJoin = v; },
+    // void setMiterLimit(in [Optional=DefaultIsUndefined] float limit);
+    setMiterLimit: function(v) { this.miterLimit = v; },
+
     // void clearRect(in [Optional=DefaultIsUndefined] float x,
     //                in [Optional=DefaultIsUndefined] float y,
     //                in [Optional=DefaultIsUndefined] float width,
@@ -560,13 +569,6 @@ exports.CanvasContext = CanvasContext;
 // 
 // void setAlpha(in [Optional=DefaultIsUndefined] float alpha);
 // void setCompositeOperation(in [Optional=DefaultIsUndefined] DOMString compositeOperation);
-// 
-// #if !defined(LANGUAGE_CPP) || !LANGUAGE_CPP
-// void setLineWidth(in [Optional=DefaultIsUndefined] float width);
-// void setLineCap(in [Optional=DefaultIsUndefined] DOMString cap);
-// void setLineJoin(in [Optional=DefaultIsUndefined] DOMString join);
-// void setMiterLimit(in [Optional=DefaultIsUndefined] float limit);
-// #endif
 // 
 // void clearShadow();
 // 
