@@ -202,6 +202,9 @@ function CanvasContext(skcanvas) {
     //
     //   Let the object's dash list be a.
     setLineDash: function(arr) {
+      // Chrome will ignore most invalid arguments, but not no argument.
+      if (arguments.length === 0) throw new TypeError('Not enough arguments');
+
       // Chrome seems to clear the dash list on a non-array argument.
       if (!Array.isArray(arr)) arr = [ ];
 
