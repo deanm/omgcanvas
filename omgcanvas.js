@@ -23,6 +23,16 @@
 var plask = require('plask');
 var parseCSSColor = require('./csscolorparser.js').parseCSSColor;
 
+// NOTE(deanm): Although in Chrome for DOM styles it seems to return a string
+// of the form rgb() or rgba() always, for <canvas> it seems to return #123123
+// syntax except for when there is a non opaque alpha.
+function colorToCSSColorString(c) {
+  if (c[3] === 1)
+    return '#' + (1<<24 | c[0]<<16 | c[1]<<8 | c[2]).toString(16).substr(1);
+  // TODO(deanm): Should we limit the alpha's precision (toPrecision()) ?
+  return 'rgba(' + c[0] + ', ' + c[1] + ', ' + c[2] + ', ' + c[3] + ')';
+}
+
 function CanvasContext(skcanvas) {
   // Each CanvasRenderingContext2D rendering context maintains a stack of
   // drawing states. Drawing states consist of:
@@ -51,9 +61,9 @@ function CanvasContext(skcanvas) {
                       lineDash: [ ],
                       lineDashOffset: 0,
                       strokeColor: [0, 0, 0, 1],
-                      strokeStyle: '#000000',
+                      strokeStyle: colorToCSSColorString([0, 0, 0, 1]),
                       fillColor: [0, 0, 0, 1],
-                      fillStyle: '#000000'}];
+                      fillStyle: colorToCSSColorString([0, 0, 0, 1])}];
   var state = state_stack[0];  // Track top element of state_stack.
 
   var path = new plask.SkPath;
@@ -96,7 +106,7 @@ function CanvasContext(skcanvas) {
       if (c !== null) {
         state.strokeColor = c;
         // Seems to be what browers do for css style properties.
-        state.strokeStyle = 'rgba(' + c.join(',') + ')';
+        state.strokeStyle = colorToCSSColorString(c);
       }
     },
 
@@ -107,7 +117,7 @@ function CanvasContext(skcanvas) {
       if (c !== null) {
         state.fillColor = c;
         // Seems to be what browers do for css style properties.
-        state.fillStyle = 'rgba(' + c.join(',') + ')';
+        state.fillStyle = colorToCSSColorString(c);
       }
     },
 
