@@ -110,9 +110,14 @@ function CanvasContext(skcanvas) {
     // attribute float lineWidth;
     get lineWidth() { return state.lineWidth; },
     set lineWidth(v) {
-      // TODO(deanm): Have to parseFloat for strings?
-      state.lineWidth = v;
-      paint.setStrokeWidth(v);
+      if ((typeof v) === 'string') v = parseFloat(v);
+
+      // NOTE(deanm): From the spec:
+      //   On setting, zero, negative, infinite, and NaN values must be ignored
+      if (v > 0 && isFinite(v)) {
+        state.lineWidth = v;
+        paint.setStrokeWidth(v);
+      }
     },
 
     // [TreatNullAs=NullString] attribute DOMString lineCap;
