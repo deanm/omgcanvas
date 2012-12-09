@@ -26,7 +26,7 @@ var parseCSSColor = require('./csscolorparser.js').parseCSSColor;
 function CanvasContext(skcanvas) {
   // Each CanvasRenderingContext2D rendering context maintains a stack of
   // drawing states. Drawing states consist of:
-  // 
+  //
   // - The current transformation matrix.
   // - The current clipping region.
   // - The current values of the following attributes: strokeStyle, fillStyle,
@@ -48,6 +48,8 @@ function CanvasContext(skcanvas) {
                       lineCap: 'butt',
                       lineJoin: 'miter',
                       miterLimit: 10,
+                      lineDash: [ ],
+                      lineDashOffset: 0,
                       strokeColor: [0, 0, 0, 1],
                       strokeStyle: '#000000',
                       fillColor: [0, 0, 0, 1],
@@ -67,6 +69,8 @@ function CanvasContext(skcanvas) {
                lineCap: state.lineCap,
                lineJoin: state.lineJoin,
                miterLimit: state.miterLimit,
+               lineDash: state.lineDash,  // Read only, no dup().
+               lineDashOffset: state.lineDashOffset,
                strokeColor: state.strokeColor,  // Read only, no dup().
                strokeStyle: state.strokeStyle,
                fillColor: state.fillColor,      // Read only, no dup().
@@ -164,6 +168,69 @@ function CanvasContext(skcanvas) {
       if (v > 0 && isFinite(v)) {
         state.miterLimit = v;
         paint.setStrokeMiter(v);
+      }
+    },
+
+    // void setLineDash(in sequence<float> dash);
+    // NOTE(deanm): From the spec:
+    //   Each CanvasDrawingStyles object has a dash list, which is either empty
+    //   or consists of an even number of non-negative numbers. Initially, the
+    //   dash list must be empty.
+    //
+    //   When the setLineDash() method is invoked, it must run the following
+    //   steps:
+    //
+    //   Let a be the argument.
+    //
+    //   If any value in a is not finite (e.g. an Infinity or a NaN value), or
+    //   if any value is negative (less than zero), then abort these steps
+    //   (without throwing an exception; user agents could show a message on a
+    //   developer console, though, as that would be helpful for debugging).
+    //
+    //   If the number of elements in a is odd, then let a be the
+    //   concatentation of two copies of a.
+    //
+    //   Let the object's dash list be a.
+    setLineDash: function(arr) {
+      // Chrome seems to clear the dash list on a non-array argument.
+      if (!Array.isArray(arr)) arr = [ ];
+
+      for (var i = 0, il = arr.length; i < il; ++i) {
+        if (arr[i] < 0 || !isFinite(arr[i])) return;
+      }
+
+      if (arr.length & 1) arr = arr.concat(arr);
+
+      state.lineDash = arr;
+
+      // TODO(deanm): Can we optimize to call setDashPathEffect less?
+      if (arr.length === 0) {
+        paint.clearPathEffect();
+      } else {
+        paint.setDashPathEffect(state.lineDash, state.lineDashOffset);
+      }
+    },
+
+    // sequence<float> getLineDash();
+    getLineDash: function() {
+      return state.lineDash.slice();  // dup.
+    },
+
+    // attribute float lineDashOffset;
+    get lineDashOffset() { return state.lineDashOffset; },
+    set lineDashOffset(v) {
+      if ((typeof v) === 'string') v = parseFloat(v);
+
+      // NOTE(deanm): From the spec:
+      //   On setting, infinite and NaN values must be ignored
+      if (isFinite(v)) {
+        state.lineDashOffset = v;
+        // TODO(deanm): Can we optimize to call setDashPathEffect less?
+        if (state.lineDash.length === 0) {
+          paint.clearPathEffect();
+        } else {
+          paint.setDashPathEffect(state.lineDash, state.lineDashOffset);
+        }
       }
     },
 
@@ -458,11 +525,7 @@ exports.CanvasContext = CanvasContext;
 // attribute float shadowOffsetY;
 // attribute float shadowBlur;
 // [TreatNullAs=NullString] attribute DOMString shadowColor;
-// 
-// void setLineDash(in sequence<float> dash);
-// sequence<float> getLineDash();
-// attribute float lineDashOffset;
-// 
+//
 // // FIXME: These attributes should also be implemented for V8.
 // #if !(defined(V8_BINDING) && V8_BINDING)
 // [Custom] attribute Array webkitLineDash;
