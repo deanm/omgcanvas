@@ -388,7 +388,11 @@ function CanvasContext(skcanvas) {
         for (var dx = 0; dx < sw; ++dx) {
           var b = skcanvas[csl++], g = skcanvas[csl++], r = skcanvas[csl++]
               a = skcanvas[csl++];
-          data[dsl++] = r; data[dsl++] = g; data[dsl++] = b; data[dsl++] = a;
+          var unpremultiply = a === 0 ? 0 : 255/a;  // Have to unpremultiply.
+          data[dsl++] = (r * unpremultiply) >> 0;
+          data[dsl++] = (g * unpremultiply) >> 0;
+          data[dsl++] = (b * unpremultiply) >> 0;
+          data[dsl++] = a;
         }
       }
 
@@ -412,7 +416,10 @@ function CanvasContext(skcanvas) {
         for (var dx = 0; dx < sw; ++dx) {
           var r = data[dsl++], g = data[dsl++]; b = data[dsl++],
               a = data[dsl++];
-          skcanvas[csl++] = b; skcanvas[csl++] = g; skcanvas[csl++] = r;
+          var fa = a / 255;  // Have to premultiply.
+          skcanvas[csl++] = (b * fa) >> 0;
+          skcanvas[csl++] = (g * fa) >> 0;
+          skcanvas[csl++] = (r * fa) >> 0;
           skcanvas[csl++] = a;
         }
       }
