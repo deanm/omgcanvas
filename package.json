@@ -1,0 +1,11 @@
+{
+  "name": "omgcanvas",
+  "version": "1.0.0",
+  "author": "Dean McNamee <dean@gmail.com>",
+  "keywords": ["plask", "canvas", "<canvas>", "html5"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deanm/omgcanvas"
+  },
+  "main": "omgcanvas.js"
+}
