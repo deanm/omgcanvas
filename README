@@ -1,12 +1,23 @@
-https://github.com/deanm/omgcanvas
-
 <canvas> implementation on top of Plask / Skia.
 
-var omgcanvas = require('./omgcanvas.js');
-var c = new omgcanvas.CanvasContext(canvas);
-c.moveTo(0, 0);
-c.lineTo(100, 100);
-c.stroke();
+https://github.com/deanm/omgcanvas
+
+- Installation via NPM
+
+  npm install omgcanvas
+
+- Installation via source
+
+  Copy omgcanvas.js and csscolorparser.js.
+
+- Usage
+
+  var omgcanvas = require('./omgcanvas.js');
+  var c = new omgcanvas.CanvasContext(skcanvas);
+  c.fillStyle = 'rgb(255, 0, 0)';
+  c.moveTo(0, 0);
+  c.lineTo(100, 100);
+  c.stroke();
 
 
 (c) Dean McNamee <dean@gmail.com>, 2012.
